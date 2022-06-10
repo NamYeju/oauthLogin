@@ -22,10 +22,13 @@ public class OauthAttributes{
     private String name;
     private String email;
 
-    // OauthUserService 코드 발췌
+    // (OauthUserService)
     // OauthAttributes attributes = OauthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
     // registrationID : 구글인지 네이버인지 구분
     public static OauthAttributes of(String registrationID, String userNameAttributeName, Map<String, Object> attributes){
+        if("naver".equals(registrationID))
+            return ofNaver("id", attributes);
+
         return ofGoogle(userNameAttributeName, attributes);
     }
 
@@ -35,6 +38,16 @@ public class OauthAttributes{
                 .email((String)attributes.get("email"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeKey)
+                .build();
+    }
+
+    public static OauthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes){
+        Map<String, Object> response = (Map<String, Object>)attributes.get("response");
+        return OauthAttributes.builder()
+                .name((String)response.get("name"))
+                .email((String)response.get("email"))
+                .attributes(response)
+                .nameAttributeKey(userNameAttributeName)
                 .build();
     }
 
